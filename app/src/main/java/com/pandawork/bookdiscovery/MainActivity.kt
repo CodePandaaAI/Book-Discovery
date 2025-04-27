@@ -5,16 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -98,65 +98,73 @@ fun AppTopBar() {
 fun BookCardWithBook(book: Book) {
     Box(
         modifier = Modifier
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(16.dp)
+            .height(300.dp)
     ) {
-        // Card
-        Card(
-            modifier = Modifier
-                .size(width = 150.dp, height = 200.dp)
-                .shadow(4.dp), // Add a shadow to the card
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary // Set card color to white
-            )
-        ) {
-            Column(modifier = Modifier.fillMaxHeight().padding(8.dp), verticalArrangement = Arrangement.Bottom) {
-                Text(
-                    book.name,
-                    style = MaterialTheme.typography.titleSmall,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    book.author,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-
-        // Book (Image)
+        // Book Image - positioned first since it affects text placement
         Image(
             painter = painterResource(id = book.imageRes),
             contentDescription = "Book cover",
+            contentScale = ContentScale.FillHeight,
             modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 0.dp,
-                        bottomEnd = 0.dp,
-                        bottomStart = 16.dp
-                    )
-                )
-                .size(130.dp, 260.dp) // Slightly smaller than the card for visual effect
-                .offset(y = (-50).dp) // Offset to move it partially above the card
-                .zIndex(1f) // Ensure the image is on top
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 0.dp,
-                        bottomEnd = 0.dp,
-                        bottomStart = 16.dp
-                    )
-                )
+                .width(160.dp)
+                .height(210.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = 20.dp)
+                .zIndex(2f)
+                .clip(RoundedCornerShape(
+                    topStart = 16.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 8.dp,
+                    bottomStart = 8.dp
+                ))
         )
+
+        // Card - positioned below the image
+        Card(
+            modifier = Modifier
+                .width(180.dp)
+                .height(210.dp)
+                .align(Alignment.BottomCenter)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(8.dp),
+                    clip = true
+                ),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            // Empty card - text will be positioned outside
+        }
+
+        // Text content - positioned at fixed point relative to image
+        Column(
+            modifier = Modifier
+                .width(160.dp)
+                .align(Alignment.BottomCenter)
+                .offset(y = (-20).dp) // Fixed position below image
+        ) {
+            Text(
+                text = book.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = book.author,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
 }
-
 
 @Preview
 @Composable
 private fun PreviewApp() {
-    BookDiscoveryTheme(darkTheme = true) {
+    BookDiscoveryTheme {
         BookApp()
     }
 }
@@ -164,7 +172,7 @@ private fun PreviewApp() {
 @Preview
 @Composable
 private fun BookPreview() {
-    BookDiscoveryTheme(darkTheme = true) {
+    BookDiscoveryTheme {
         BookCardWithBook(Books.booksList[0])
     }
 }
