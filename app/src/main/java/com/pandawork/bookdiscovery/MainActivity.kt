@@ -23,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -86,11 +87,11 @@ fun AppTopBar() {
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = null
         )
+        Spacer(Modifier.padding(horizontal = 160.dp))
     }, title = {
-        Text(
-            stringResource(R.string.app_name),
-            style = MaterialTheme.typography.displayMedium
-        )
+        IconButton(onClick = {}) {
+            Image(painterResource(R.drawable.profile_pic), contentDescription = null)
+        }
     })
 }
 
@@ -98,7 +99,7 @@ fun AppTopBar() {
 fun BookCardWithBook(book: Book) {
     Box(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(14.dp)
             .height(300.dp)
     ) {
         // Book Image - positioned first since it affects text placement
@@ -112,12 +113,14 @@ fun BookCardWithBook(book: Book) {
                 .align(Alignment.TopCenter)
                 .offset(y = 20.dp)
                 .zIndex(2f)
-                .clip(RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 0.dp,
-                    bottomEnd = 8.dp,
-                    bottomStart = 8.dp
-                ))
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 0.dp,
+                        bottomEnd = 8.dp,
+                        bottomStart = 8.dp
+                    )
+                )
         )
 
         // Card - positioned below the image
