@@ -1,4 +1,116 @@
 <resources>
     <string name="app_name">Book Discovery</string>
     <string name="library_title">Library</string>
+
+    <!-- Psychology Books -->
+    <string name="psychology_book_1_title">Individual Differences And Personality</string>
+    <string name="psychology_book_1_author">Michael C ASHTON</string>
+    <string name="psychology_book_1_url">https://www.sciencedirect.com/book/9780323859509/individual-differences-and-personality</string>
+
+    <string name="psychology_book_2_title">Personality And Disease</string>
+    <string name="psychology_book_2_author">Christoffer Johansen</string>
+    <string name="psychology_book_2_url">https://www.amazon.in/Personality-Disease-Scientific-Wishful-Thinking/dp/0128053003</string>
+
+    <string name="psychology_book_3_title">Carrots Grow Underground</string>
+    <string name="psychology_book_3_author">Gail Saunders, PhD</string>
+    <string name="psychology_book_3_url">https://www.amazon.in/Carrots-Grow-Underground-Fruit-Vegetables/dp/1429661852</string>
+
+    <string name="psychology_book_4_title">Together We Grow</string>
+    <string name="psychology_book_4_author">Susan Vaught &amp; Kelly Murphy</string>
+    <string name="psychology_book_4_url">https://www.amazon.in/Together-We-Grow-Susan-Vaught/dp/1534405860</string>
+
+    <string name="psychology_book_5_title">Grow With Words</string>
+    <string name="psychology_book_5_author">Amity University Press</string>
+    <string name="psychology_book_5_url">https://www.amazon.in/Grow-Words-English-Course-Class/dp/8180110907</string>
+
+    <string name="psychology_book_6_title">Thinking Fast And Slow</string>
+    <string name="psychology_book_6_author">Daniel Kahneman</string>
+    <string name="psychology_book_6_url">https://www.amazon.com/Thinking-Fast-Slow-Daniel-Kahneman/dp/0374533555</string>
+
+    <string name="psychology_book_7_title">Man\'s Search For Meaning</string>
+    <string name="psychology_book_7_author">Viktor E. Frankl</string>
+    <string name="psychology_book_7_url">https://www.amazon.in/Mans-Search-Meaning-Viktor-Frankl/dp/1846041244</string>
+
+    <string name="psychology_book_8_title">Oliver Sacks The Man Who Mistook his Wife for a Hat</string>
+    <string name="psychology_book_8_author">Christoffer Johansen</string>
+    <string name="psychology_book_8_url">https://www.amazon.in/Man-Who-Mistook-His-Wife/dp/0684853949</string>
+
+    <string name="psychology_book_9_title">Atomic Habits</string>
+    <string name="psychology_book_9_author">James Clear</string>
+    <string name="psychology_book_9_url">https://www.meesho.com/atomic-habits-by-james-clear-an-easy-proven-way-to-build-good-habits-break-bad-ones/p/643em3</string>
+
+    <string name="psychology_book_10_title">The Subtle Art Of Not Giving A F*ck</string>
+    <string name="psychology_book_10_author">Mark Manson</string>
+    <string name="psychology_book_10_url">https://www.amazon.in/Subtle-Art-Not-Giving/dp/0062641549</string>
+
+    <string name="psychology_book_11_title">Games People Play</string>
+    <string name="psychology_book_11_author">Eric Berne</string>
+    <string name="psychology_book_11_url">https://www.goodreads.com/book/show/49176.Games_People_Play</string>
+
+    <!-- Manga & Anime Books -->
+    <string name="manga_anime_book_1_title">Jujutsu Kaisen Band 25</string>
+    <string name="manga_anime_book_1_author">Gege Akutami</string>
+    <string name="manga_anime_book_1_url">https://www.amazon.in/Jujutsu-Kaisen-Band-Gege-Akutami/dp/2889518191</string>
+
+    <string name="manga_anime_book_2_title">Jujutsu Kaisen Vol 1</string>
+    <string name="manga_anime_book_2_author">Gege Akutami</string>
+    <string name="manga_anime_book_2_url">https://www.amazon.in/Jujutsu-Kaisen-Vol-Gege-Akutami/dp/1974710025</string>
+
+    <string name="manga_anime_book_3_title">Solo Leveling Vol 11</string>
+    <string name="manga_anime_book_3_author">Chugong</string>
+    <string name="manga_anime_book_3_url">https://www.amazon.com/Solo-Leveling-Vol-11-comic/dp/B0DF72RDNH</string>
+
+    <string name="manga_anime_book_4_title">Dandadan Vol 1</string>
+    <string name="manga_anime_book_4_author">Yukinobu Tatsu</string>
+    <string name="manga_anime_book_4_url">https://www.amazon.in/Dandadan-Vol-1-Yukinobu-Tatsu/dp/1974734633</string>
+
+    <string name="manga_anime_book_5_title">My Dress-Up Darling</string>
+    <string name="manga_anime_book_5_author">Shinichi Fukuda</string>
+    <string name="manga_anime_book_5_url">https://www.amazon.in/My-Dress-up-Darling-Shinichi-Fukuda/dp/1646093658</string>
+
+    <string name="manga_anime_book_6_title">Solo Leveling Vol 3</string>
+    <string name="manga_anime_book_6_author">Chugong</string>
+    <string name="manga_anime_book_6_url">https://www.amazon.in/Solo-Leveling-vol3-Chugong/dp/B0CW5WCR2W</string>
+
+    <string name="manga_anime_book_7_title">OnePiece Vol 108</string>
+    <string name="manga_anime_book_7_author">Eiichiro Oda</string>
+    <string name="manga_anime_book_7_url">https://www.amazon.in/One-Piece-Vol-108-Eiichiro/dp/6525934338</string>
+
+    <string name="manga_anime_book_8_title">Kagurabachi</string>
+    <string name="manga_anime_book_8_author">Takeru Hokazono</string>
+    <string name="manga_anime_book_8_url">https://www.amazon.com/Kagurabachi-Vol-3-Takeru-Hokazono/dp/1974754782</string>
+
+    <!-- Business Books -->
+    <string name="business_book_1_title">Trade And Grow Rich</string>
+    <string name="business_book_1_author">Indrazith Shantharaj</string>
+    <string name="business_book_1_url">https://www.amazon.in/Trade-Grow-Rich-Adventurous-Successful/dp/B0D8RF2X9C</string>
+
+    <string name="business_book_2_title">The First 90 Days</string>
+    <string name="business_book_2_author">Michael D. Watkins</string>
+    <string name="business_book_2_url">https://www.amazon.in/First-90-Days-Watkins/dp/1422188612</string>
+
+    <string name="business_book_3_title">Leading Change</string>
+    <string name="business_book_3_author">John P.Kotter</string>
+    <string name="business_book_3_url">https://www.amazon.in/Leading-Change-Foremost-Business-Leadership/dp/142720232X</string>
+
+    <string name="business_book_4_title">LeaderShip On The Line</string>
+    <string name="business_book_4_author">Ronald Heifetz</string>
+    <string name="business_book_4_url">https://www.amazon.in/Leadership-Line-Staying-Through-Dangers/dp/1578514371</string>
+
+    <string name="business_book_5_title">Primal LeaderShip</string>
+    <string name="business_book_5_author">Daniel Goleman</string>
+    <string name="business_book_5_url">https://www.amazon.in/Primal-Leadership-New-Preface-Authors/dp/1422168034</string>
+
+    <!-- Health and Safety Books -->
+    <string name="health_safety_book_1_title">International Health And Safety</string>
+    <string name="health_safety_book_1_author">Dr Luise Vassie</string>
+    <string name="health_safety_book_1_url">https://shop.nebosh.org.uk/collections/course-books/products/international-health-and-safety</string>
+
+    <string name="health_safety_book_2_title">Manual Handling Risk Assessment</string>
+    <string name="health_safety_book_2_author">Nebosh</string>
+    <string name="health_safety_book_2_url">https://shop.nebosh.org.uk/collections/course-books/products/manual-handling-risk-assessment-print-edition</string>
+    <string name="business_category_title">Business</string>
+    <string name="manga_anime_category_title">Manga Anime</string>
+    <string name="psychology_category_title">Psychology</string>
+    <string name="health_safety_category_title"><![CDATA[Health & Safety]]></string>
 </resources>
