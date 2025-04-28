@@ -232,13 +232,15 @@ fun AppTopBar() {
             )
         },
         title = {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.End,
             ) {
                 IconButton(onClick = {}) {
                     Image(painterResource(R.drawable.profile_pic), contentDescription = null)
                 }
+                Spacer(Modifier.width(24.dp))
             }
         })
 }
