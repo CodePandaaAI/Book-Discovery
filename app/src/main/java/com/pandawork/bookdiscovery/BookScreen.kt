@@ -1,6 +1,8 @@
 package com.pandawork.bookdiscovery
 
+import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,10 +61,10 @@ import com.pandawork.bookdiscovery.ui.theme.BookDiscoveryTheme
 
 @Composable
 fun BookApp() {
-    Scaffold(topBar = { AppTopBar() }, bottomBar = { BottomAppBar() }) { innerPadding ->
+    Scaffold(topBar = { AppTopBar() }, bottomBar = { BottomAppBar() }) { scaffoldPadding ->
         LazyColumn(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(scaffoldPadding)
                 .fillMaxWidth()
         ) {
             item {
@@ -72,9 +74,13 @@ fun BookApp() {
     }
 }
 
+private enum class Tab {
+    HOME, BOOKMARK, SHOP
+}
+
 @Composable
 private fun BottomAppBar() {
-    var selectedTab by remember { mutableStateOf(Tab.HOME) }
+    var currentTab by remember { mutableStateOf(Tab.HOME) }
 
     BottomAppBar(
         actions = {
@@ -86,22 +92,22 @@ private fun BottomAppBar() {
             ) {
                 Spacer(modifier = Modifier.weight(1f))
                 TabIcon(
-                    selected = selectedTab == Tab.HOME,
-                    filledIcon = painterResource(R.drawable.baseline_home_24),
-                    outlinedIcon = painterResource(R.drawable.outline_home_24),
-                    onClick = { selectedTab = Tab.HOME })
+                    selected = currentTab == Tab.HOME,
+                    selectedIcon = painterResource(R.drawable.baseline_home_24),
+                    unselectedIcon = painterResource(R.drawable.outline_home_24),
+                    onClick = { currentTab = Tab.HOME })
                 Spacer(Modifier.padding(horizontal = 24.dp))
                 TabIcon(
-                    selected = selectedTab == Tab.BOOKMARK,
-                    filledIcon = painterResource(R.drawable.baseline_bookmark_24),
-                    outlinedIcon = painterResource(R.drawable.baseline_bookmark_border_24),
-                    onClick = { selectedTab = Tab.BOOKMARK })
+                    selected = currentTab == Tab.BOOKMARK,
+                    selectedIcon = painterResource(R.drawable.baseline_bookmark_24),
+                    unselectedIcon = painterResource(R.drawable.baseline_bookmark_border_24),
+                    onClick = { currentTab = Tab.BOOKMARK })
                 Spacer(Modifier.padding(horizontal = 24.dp))
                 TabIcon(
-                    selected = selectedTab == Tab.SHOP,
-                    filledIcon = painterResource(R.drawable.baseline_shopping_bag_24),
-                    outlinedIcon = painterResource(R.drawable.outline_shopping_bag_24),
-                    onClick = { selectedTab = Tab.SHOP })
+                    selected = currentTab == Tab.SHOP,
+                    selectedIcon = painterResource(R.drawable.baseline_shopping_bag_24),
+                    unselectedIcon = painterResource(R.drawable.outline_shopping_bag_24),
+                    onClick = { currentTab = Tab.SHOP })
                 Spacer(modifier = Modifier.weight(1f))
             }
         })
@@ -110,19 +116,15 @@ private fun BottomAppBar() {
 
 @Composable
 private fun TabIcon(
-    selected: Boolean, filledIcon: Painter, outlinedIcon: Painter, onClick: () -> Unit
+    selected: Boolean, selectedIcon: Painter, unselectedIcon: Painter, onClick: () -> Unit
 ) {
     IconButton(onClick = onClick) {
         Icon(
-            painter = if (selected) filledIcon else outlinedIcon,
+            painter = if (selected) selectedIcon else unselectedIcon,
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
     }
-}
-
-private enum class Tab {
-    HOME, BOOKMARK, SHOP
 }
 
 @Composable
@@ -138,19 +140,7 @@ fun BookItems() {
             )
     )
     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_small)))
-    LazyRow {
-        items(PsychologyBooks.booksList) { book ->
-            BookCardWithBook(
-                Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
-                    .height(300.dp), book, onBookClicked = {
-                    val url = it.link
-                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
-                }
-            )
-        }
-    }
+    BookRowCategoryWise(PsychologyBooks.booksList, context)
     Text(
         stringResource(R.string.manga_anime_category_title),
         style = MaterialTheme.typography.headlineLarge,
@@ -160,19 +150,7 @@ fun BookItems() {
         )
     )
     Spacer(modifier = Modifier.height(8.dp))
-    LazyRow {
-        items(MangaAnimeBooks.booksList) { book ->
-            BookCardWithBook(
-                Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
-                    .height(300.dp), book, onBookClicked = {
-                    val url = it.link
-                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
-                }
-            )
-        }
-    }
+    BookRowCategoryWise(MangaAnimeBooks.booksList,context)
     Text(
         stringResource(R.string.business_category_title),
         style = MaterialTheme.typography.headlineLarge,
@@ -182,19 +160,7 @@ fun BookItems() {
         )
     )
     Spacer(modifier = Modifier.height(8.dp))
-    LazyRow {
-        items(BusinessBooks.booksList) { book ->
-            BookCardWithBook(
-                Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
-                    .height(300.dp), book, onBookClicked = {
-                    val url = it.link
-                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
-                }
-            )
-        }
-    }
+    BookRowCategoryWise(BusinessBooks.booksList, context)
 
     Text(
         stringResource(R.string.health_safety_category_title),
@@ -205,15 +171,25 @@ fun BookItems() {
         )
     )
     Spacer(modifier = Modifier.height(8.dp))
+    BookRowCategoryWise(HealthAndSafetyBooks.booksList, context)
+}
+
+@Composable
+private fun BookRowCategoryWise(books: List<Book>, context: Context) {
     LazyRow {
-        items(HealthAndSafetyBooks.booksList) { book ->
+        items(books) { currentBook ->
             BookCardWithBook(
                 Modifier
                     .padding(dimensionResource(R.dimen.padding_small))
-                    .height(300.dp), book, onBookClicked = {
-                    val url = it.link
-                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    context.startActivity(intent)
+                    .height(300.dp), currentBook, onBookClicked = {
+                    val link = it.link
+                    val webIntent = Intent(Intent.ACTION_VIEW, link.toUri())
+                    if (webIntent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(webIntent)
+                    } else {
+                        // 🛑 No app found to handle the Intent
+                        Toast.makeText(context, "No Browser App Found!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             )
         }
@@ -246,14 +222,14 @@ fun AppTopBar() {
 }
 
 @Composable
-fun BookCardWithBook(modifier: Modifier = Modifier, book: Book, onBookClicked: (Book) -> Unit) {
+fun BookCardWithBook(modifier: Modifier = Modifier, currentBook: Book, onBookClicked: (Book) -> Unit) {
     Box(
         modifier = modifier.clickable {
-            onBookClicked(book)
+            onBookClicked(currentBook)
         }) {
         // Book Image - positioned first since it affects text placement
         Image(
-            painter = painterResource(id = book.imageRes),
+            painter = painterResource(id = currentBook.imageRes),
             contentDescription = "Book cover",
             contentScale = ContentScale.FillHeight,
             modifier = Modifier
@@ -296,14 +272,14 @@ fun BookCardWithBook(modifier: Modifier = Modifier, book: Book, onBookClicked: (
                 .padding(start = dimensionResource(id = R.dimen.padding_medium))
         ) {
             Text(
-                text = book.name,
+                text = currentBook.name,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             Text(
-                text = book.author,
+                text = currentBook.author,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -327,6 +303,7 @@ private fun BookPreview() {
                 .padding(14.dp)
                 .height(300.dp),
             PsychologyBooks.booksList[0],
-            onBookClicked = {})
+            onBookClicked = {}
+        )
     }
 }
