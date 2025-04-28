@@ -34,7 +34,7 @@ object MangaAnimeBooks {
 
 object BusinessBooks {
     val booksList = listOf(
-        Book(R.drawable.business_book_one, "Trade And Grow Rich", "Indrazith Shantharaj", "file:///C:/Users/4444444/AndroidStudioProjects/BookDiscovery/app/src/main/res/drawable-nodpi/business_book_one.webp"),
+        Book(R.drawable.business_book_one, "Trade And Grow Rich", "Indrazith Shantharaj", "https://www.amazon.in/Trade-Grow-Rich-Adventurous-Successful/dp/B0D8RF2X9C"),
         Book(R.drawable.business_book_two, "The First 90 Days", "Michael D. Watkins", "https://www.amazon.in/First-90-Days-Watkins/dp/1422188612"),
         Book(R.drawable.business_book_three, "Leading Change", "John P.Kotter", "https://www.amazon.in/Leading-Change-Foremost-Business-Leadership/dp/142720232X"),
         Book(R.drawable.business_book_four, "LeaderShip On The Line", "Ronald Heifetz", "https://www.amazon.in/Leadership-Line-Staying-Through-Dangers/dp/1578514371"),
