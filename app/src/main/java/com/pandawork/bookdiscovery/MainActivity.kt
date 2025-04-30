@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BookDiscoveryTheme {
-                BookApp()
+                AppNavHost()
             }
         }
     }
