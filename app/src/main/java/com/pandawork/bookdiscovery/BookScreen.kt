@@ -33,10 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,16 +50,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pandawork.bookdiscovery.data.BusinessBooks
 import com.pandawork.bookdiscovery.data.HealthAndSafetyBooks
 import com.pandawork.bookdiscovery.data.MangaAnimeBooks
 import com.pandawork.bookdiscovery.data.PsychologyBooks
 import com.pandawork.bookdiscovery.model.Book
+import com.pandawork.bookdiscovery.ui.BookViewModel
 import com.pandawork.bookdiscovery.ui.theme.BookDiscoveryTheme
 
+
 @Composable
-fun BookApp() {
-    Scaffold(topBar = { AppTopBar() }, bottomBar = { BottomAppBar() }) { scaffoldPadding ->
+fun BookHomeScreen(viewModel: BookViewModel = viewModel()) {
+    Scaffold(topBar = { TopAppBar() }, bottomBar = { BottomAppBar(viewModel) }) { scaffoldPadding ->
         LazyColumn(
             modifier = Modifier
                 .padding(scaffoldPadding)
@@ -74,131 +75,9 @@ fun BookApp() {
     }
 }
 
-private enum class Tab {
-    HOME, BOOKMARK, SHOP
-}
-
-@Composable
-private fun BottomAppBar() {
-    var currentTab by remember { mutableStateOf(Tab.HOME) }
-
-    BottomAppBar(
-        actions = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.padding_large)),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-                TabIcon(
-                    selected = currentTab == Tab.HOME,
-                    selectedIcon = painterResource(R.drawable.baseline_home_24),
-                    unselectedIcon = painterResource(R.drawable.outline_home_24),
-                    onClick = { currentTab = Tab.HOME })
-                Spacer(Modifier.padding(horizontal = 24.dp))
-                TabIcon(
-                    selected = currentTab == Tab.BOOKMARK,
-                    selectedIcon = painterResource(R.drawable.baseline_bookmark_24),
-                    unselectedIcon = painterResource(R.drawable.baseline_bookmark_border_24),
-                    onClick = { currentTab = Tab.BOOKMARK })
-                Spacer(Modifier.padding(horizontal = 24.dp))
-                TabIcon(
-                    selected = currentTab == Tab.SHOP,
-                    selectedIcon = painterResource(R.drawable.baseline_shopping_bag_24),
-                    unselectedIcon = painterResource(R.drawable.outline_shopping_bag_24),
-                    onClick = { currentTab = Tab.SHOP })
-                Spacer(modifier = Modifier.weight(1f))
-            }
-        })
-
-}
-
-@Composable
-private fun TabIcon(
-    selected: Boolean, selectedIcon: Painter, unselectedIcon: Painter, onClick: () -> Unit
-) {
-    IconButton(onClick = onClick) {
-        Icon(
-            painter = if (selected) selectedIcon else unselectedIcon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
-    }
-}
-
-@Composable
-fun BookItems() {
-    val context = LocalContext.current
-    Text(
-        stringResource(R.string.psychology_category_title),
-        style = MaterialTheme.typography.headlineLarge,
-        modifier =
-            Modifier.padding(
-                start = dimensionResource(R.dimen.padding_large),
-                top = dimensionResource(R.dimen.padding_large)
-            )
-    )
-    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_small)))
-    BookRowCategoryWise(PsychologyBooks.booksList, context)
-    Text(
-        stringResource(R.string.manga_anime_category_title),
-        style = MaterialTheme.typography.headlineLarge,
-        modifier = Modifier.padding(
-            start = dimensionResource(R.dimen.padding_large),
-            top = dimensionResource(R.dimen.padding_large)
-        )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    BookRowCategoryWise(MangaAnimeBooks.booksList,context)
-    Text(
-        stringResource(R.string.business_category_title),
-        style = MaterialTheme.typography.headlineLarge,
-        modifier = Modifier.padding(
-            start = dimensionResource(R.dimen.padding_large),
-            top = dimensionResource(R.dimen.padding_large)
-        )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    BookRowCategoryWise(BusinessBooks.booksList, context)
-
-    Text(
-        stringResource(R.string.health_safety_category_title),
-        style = MaterialTheme.typography.headlineLarge,
-        modifier = Modifier.padding(
-            start = dimensionResource(R.dimen.padding_large),
-            top = dimensionResource(R.dimen.padding_large)
-        )
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    BookRowCategoryWise(HealthAndSafetyBooks.booksList, context)
-}
-
-@Composable
-private fun BookRowCategoryWise(books: List<Book>, context: Context) {
-    LazyRow {
-        items(books) { currentBook ->
-            BookCardWithBook(
-                Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
-                    .height(300.dp), currentBook, onBookClicked = {
-                    val link = it.link
-                    val webIntent = Intent(Intent.ACTION_VIEW, link.toUri())
-                    if (webIntent.resolveActivity(context.packageManager) != null) {
-                        context.startActivity(webIntent)
-                    } else {
-                        // 🛑 No app found to handle the Intent
-                        Toast.makeText(context, "No Browser App Found!", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppTopBar() {
+fun TopAppBar() {
     CenterAlignedTopAppBar(
         navigationIcon = {
             Icon(
@@ -218,11 +97,142 @@ fun AppTopBar() {
                 }
                 Spacer(Modifier.width(24.dp))
             }
-        })
+        }
+    )
+}
+
+enum class Tab {
+    HOME, BOOKMARK, SHOP
 }
 
 @Composable
-fun BookCardWithBook(modifier: Modifier = Modifier, currentBook: Book, onBookClicked: (Book) -> Unit) {
+fun BottomAppBar(viewModel: BookViewModel) {
+    val currentTabState by viewModel.bookUiState.collectAsState()
+    BottomAppBar(
+        actions = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_large)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                TabIcon(
+                    selected = currentTabState.currentTab == Tab.HOME,
+                    selectedIcon = painterResource(R.drawable.baseline_home_24),
+                    unselectedIcon = painterResource(R.drawable.outline_home_24),
+                    onClick = { viewModel.updateTab(Tab.HOME) })
+                Spacer(Modifier.padding(horizontal = 24.dp))
+                TabIcon(
+                    selected = currentTabState.currentTab == Tab.BOOKMARK,
+                    selectedIcon = painterResource(R.drawable.baseline_bookmark_24),
+                    unselectedIcon = painterResource(R.drawable.baseline_bookmark_border_24),
+                    onClick = { viewModel.updateTab(Tab.BOOKMARK) })
+                Spacer(Modifier.padding(horizontal = 24.dp))
+                TabIcon(
+                    selected = currentTabState.currentTab == Tab.SHOP,
+                    selectedIcon = painterResource(R.drawable.baseline_shopping_bag_24),
+                    unselectedIcon = painterResource(R.drawable.outline_shopping_bag_24),
+                    onClick = { viewModel.updateTab(Tab.SHOP) })
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    )
+
+}
+
+@Composable
+private fun TabIcon(
+    selected: Boolean, selectedIcon: Painter, unselectedIcon: Painter, onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = if (selected) selectedIcon else unselectedIcon,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun BookItems(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    LazyColumn {
+        item {
+            Text(
+                stringResource(R.string.psychology_category_title),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier =
+                    Modifier.padding(
+                        start = dimensionResource(R.dimen.padding_large),
+                        top = dimensionResource(R.dimen.padding_large)
+                    )
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_small)))
+            BookRowCategoryWise(PsychologyBooks.booksList, context)
+            Text(
+                stringResource(R.string.manga_anime_category_title),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.padding_large),
+                    top = dimensionResource(R.dimen.padding_large)
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BookRowCategoryWise(MangaAnimeBooks.booksList, context)
+            Text(
+                stringResource(R.string.business_category_title),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.padding_large),
+                    top = dimensionResource(R.dimen.padding_large)
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BookRowCategoryWise(BusinessBooks.booksList, context)
+
+            Text(
+                stringResource(R.string.health_safety_category_title),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.padding_large),
+                    top = dimensionResource(R.dimen.padding_large)
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BookRowCategoryWise(HealthAndSafetyBooks.booksList, context)
+        }
+    }
+}
+
+@Composable
+private fun BookRowCategoryWise(books: List<Book>, context: Context) {
+    LazyRow {
+        items(books) { currentBook ->
+            BookDisplayCard(
+                Modifier
+                    .padding(dimensionResource(R.dimen.padding_small))
+                    .height(300.dp), currentBook, onBookClicked = {
+                    val link = it.link
+                    val webIntent = Intent(Intent.ACTION_VIEW, link.toUri())
+                    if (webIntent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(webIntent)
+                    } else {
+                        // 🛑 No app found to handle the Intent
+                        Toast.makeText(context, "No Browser App Found!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun BookDisplayCard(
+    modifier: Modifier = Modifier,
+    currentBook: Book,
+    onBookClicked: (Book) -> Unit
+) {
     Box(
         modifier = modifier.clickable {
             onBookClicked(currentBook)
@@ -255,8 +265,12 @@ fun BookCardWithBook(modifier: Modifier = Modifier, currentBook: Book, onBookCli
                 .height(210.dp)
                 .align(Alignment.BottomCenter)
                 .shadow(
-                    elevation = 8.dp, shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)), clip = true
-                ), shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)), colors = CardDefaults.cardColors(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)),
+                    clip = true
+                ),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)),
+            colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
@@ -290,7 +304,7 @@ fun BookCardWithBook(modifier: Modifier = Modifier, currentBook: Book, onBookCli
 @Composable
 private fun PreviewApp() {
     BookDiscoveryTheme {
-        BookApp()
+        BookHomeScreen()
     }
 }
 
@@ -298,7 +312,7 @@ private fun PreviewApp() {
 @Composable
 private fun BookPreview() {
     BookDiscoveryTheme {
-        BookCardWithBook(
+        BookDisplayCard(
             Modifier
                 .padding(14.dp)
                 .height(300.dp),
