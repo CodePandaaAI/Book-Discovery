@@ -169,7 +169,7 @@ fun BookItems(modifier: Modifier = Modifier) {
                     )
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_small)))
-            BookRowCategoryWise(PsychologyBooks.booksList, context)
+            BookRowCategoryWise(PsychologyBooks.getBooksList(context), context)
             Text(
                 stringResource(R.string.manga_anime_category_title),
                 style = MaterialTheme.typography.headlineLarge,
@@ -179,7 +179,7 @@ fun BookItems(modifier: Modifier = Modifier) {
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
-            BookRowCategoryWise(MangaAnimeBooks.booksList, context)
+            BookRowCategoryWise(MangaAnimeBooks.getBooksList(context), context)
             Text(
                 stringResource(R.string.business_category_title),
                 style = MaterialTheme.typography.headlineLarge,
@@ -189,7 +189,7 @@ fun BookItems(modifier: Modifier = Modifier) {
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
-            BookRowCategoryWise(BusinessBooks.booksList, context)
+            BookRowCategoryWise(BusinessBooks.getBooksList(context), context)
 
             Text(
                 stringResource(R.string.health_safety_category_title),
@@ -200,7 +200,7 @@ fun BookItems(modifier: Modifier = Modifier) {
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
-            BookRowCategoryWise(HealthAndSafetyBooks.booksList, context)
+            BookRowCategoryWise(HealthAndSafetyBooks.getBooksList(context), context)
         }
     }
 }
@@ -213,7 +213,7 @@ private fun BookRowCategoryWise(books: List<Book>, context: Context) {
                 Modifier
                     .padding(dimensionResource(R.dimen.padding_small))
                     .height(300.dp), currentBook, onBookClicked = {
-                    val link = it.link
+                    val link = currentBook.link
                     val webIntent = Intent(Intent.ACTION_VIEW, link.toUri())
                     if (webIntent.resolveActivity(context.packageManager) != null) {
                         context.startActivity(webIntent)
@@ -231,11 +231,11 @@ private fun BookRowCategoryWise(books: List<Book>, context: Context) {
 fun BookDisplayCard(
     modifier: Modifier = Modifier,
     currentBook: Book,
-    onBookClicked: (Book) -> Unit
+    onBookClicked: () -> Unit
 ) {
     Box(
         modifier = modifier.clickable {
-            onBookClicked(currentBook)
+            onBookClicked()
         }) {
         // Book Image - positioned first since it affects text placement
         Image(
@@ -316,7 +316,7 @@ private fun BookPreview() {
             Modifier
                 .padding(14.dp)
                 .height(300.dp),
-            PsychologyBooks.booksList[0],
+            PsychologyBooks.getBooksList(LocalContext.current)[0],
             onBookClicked = {}
         )
     }
