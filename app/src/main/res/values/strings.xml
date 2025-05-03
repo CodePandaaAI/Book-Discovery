@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Book Discovery</string>
     <string name="library_title">Library</string>
+    <string name="psychology_category_title">Psychology</string>
+    <string name="health_safety_category_title"><![CDATA[Health & Safety]]></string>
+    <string name="business_category_title">Business</string>
+    <string name="manga_anime_category_title">Manga Anime</string>
 
     <!-- Psychology Books -->
     <string name="psychology_book_1_title">Individual Differences And Personality</string>
@@ -109,8 +113,4 @@
     <string name="health_safety_book_2_title">Manual Handling Risk Assessment</string>
     <string name="health_safety_book_2_author">Nebosh</string>
     <string name="health_safety_book_2_url">https://shop.nebosh.org.uk/collections/course-books/products/manual-handling-risk-assessment-print-edition</string>
-    <string name="business_category_title">Business</string>
-    <string name="manga_anime_category_title">Manga Anime</string>
-    <string name="psychology_category_title">Psychology</string>
-    <string name="health_safety_category_title"><![CDATA[Health & Safety]]></string>
 </resources>
