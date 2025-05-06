@@ -78,7 +78,7 @@ fun BookAppNavHost(viewModel: BookViewModel = viewModel()) {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { BookItems() }
+            composable("home") { BookHomeScreen() }
             composable("bookmark") { /* Your bookmark screen */ }
             composable("shop") { ShoppingScreen() }
         }
@@ -148,7 +148,6 @@ fun BottomAppBar(viewModel: BookViewModel) {
             }
         }
     )
-
 }
 
 @Composable

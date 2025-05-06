@@ -31,32 +31,32 @@ val Typography = Typography(
     displayMedium = TextStyle(
         fontFamily = RobotoSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 28.sp
+        fontSize = 34.sp
     ),
     displaySmall = TextStyle(
         fontFamily = RobotoSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 24.sp
+        fontSize = 32.sp
     ),
     headlineLarge = TextStyle(
         fontFamily = RobotoSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 32.sp
+        fontSize = 28.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = RobotoSerif,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp
+        fontSize = 24.sp
     ),
     headlineSmall = TextStyle(
         fontFamily = RobotoSerif,
         fontWeight = FontWeight.Bold,
-        fontSize = 24.sp
+        fontSize = 20.sp
     ),
     titleLarge = TextStyle(
         fontFamily = RobotoSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 22.sp
+        fontSize = 18.sp
     ),
     titleMedium = TextStyle(
         fontFamily = RobotoSerif,
@@ -71,22 +71,22 @@ val Typography = Typography(
     labelLarge = TextStyle(
         fontFamily = Nunito,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp
+        fontSize = 10.sp
     ),
     labelMedium = TextStyle(
         fontFamily = Nunito,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp
+        fontSize = 8.sp
     ),
     labelSmall = TextStyle(
         fontFamily = Nunito,
         fontWeight = FontWeight.Bold,
-        fontSize = 10.sp
+        fontSize = 6.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = Nunito,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        fontSize = 12.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = Nunito,
