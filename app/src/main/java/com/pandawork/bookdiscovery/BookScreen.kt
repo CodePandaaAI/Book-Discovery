@@ -3,6 +3,7 @@ package com.pandawork.bookdiscovery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -82,22 +84,13 @@ fun BookHomeScreen() {
 
 @Composable
 fun BookDetails(bookUiState: BookUiState) {
-    Box(
+    Surface(
         Modifier
             .background(color = MaterialTheme.colorScheme.background)
-            .clip(RoundedCornerShape(16.dp)),
-        contentAlignment = Alignment.Center
+            .clip(
+                RoundedCornerShape(16.dp)
+            )
     ) {
-//        Image(
-//            painter = painterResource(R.drawable.background),
-//            contentDescription = null,
-//            modifier = Modifier.fillMaxWidth()
-//        )
-        Image(
-            painter = painterResource(R.drawable.back),
-            contentDescription = null,
-            modifier = Modifier.fillMaxWidth()
-        )
         Column(
             Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -119,7 +112,9 @@ fun BookDetails(bookUiState: BookUiState) {
                     )
             )
             Spacer(Modifier.height(8.dp))
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Button(onClick = {}) { Text("dud") }
                 Button(onClick = {}) { }
             }
