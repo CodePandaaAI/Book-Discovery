@@ -113,4 +113,8 @@
     <string name="health_safety_book_2_title">Manual Handling Risk Assessment</string>
     <string name="health_safety_book_2_author">Nebosh</string>
     <string name="health_safety_book_2_url">https://shop.nebosh.org.uk/collections/course-books/products/manual-handling-risk-assessment-print-edition</string>
+    <string name="visit_site_button_text">Visit Site</string>
+    <string name="share_button_cd">Share</string>
+    <string name="no_browser_app_found">No Browser App Found</string>
+    <string name="close_button_text">Close</string>
 </resources>

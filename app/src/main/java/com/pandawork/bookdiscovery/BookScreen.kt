@@ -1,47 +1,55 @@
 package com.pandawork.bookdiscovery
 
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.zIndex
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pandawork.bookdiscovery.data.BookUiState
 import com.pandawork.bookdiscovery.data.BusinessBooks
 import com.pandawork.bookdiscovery.data.HealthAndSafetyBooks
 import com.pandawork.bookdiscovery.data.MangaAnimeBooks
@@ -50,112 +58,160 @@ import com.pandawork.bookdiscovery.model.Book
 import com.pandawork.bookdiscovery.ui.BookViewModel
 import com.pandawork.bookdiscovery.ui.theme.BookDiscoveryTheme
 
+// Consistent naming and type for book list providers
+data class BookCategory(
+    @StringRes val titleResId: Int,
+    val booksProvider: (context: Context) -> List<Book>
+)
+
 @Composable
-fun BookHomeScreen() {
-    val appContext = LocalContext.current
-    val bookViewModel: BookViewModel = viewModel()
-    val bookUiState by bookViewModel.bookUiState.collectAsState()
+fun BookHomeScreen(bookViewModel: BookViewModel = viewModel()) { // Allow ViewModel injection for testability
+    val uiState by bookViewModel.bookUiState.collectAsState()
+    val context = LocalContext.current
+
+    // Memoize categories list
+    val categories = remember {
+        listOf(
+            BookCategory(R.string.psychology_category_title) { ctx -> PsychologyBooks.getBooksList(ctx) },
+            BookCategory(R.string.manga_anime_category_title) { ctx -> MangaAnimeBooks.getBooksList(ctx) },
+            BookCategory(R.string.business_category_title) { ctx -> BusinessBooks.getBooksList(ctx) },
+            BookCategory(R.string.health_safety_category_title) { ctx -> HealthAndSafetyBooks.getBooksList(ctx) }
+            // Add more categories here
+        )
+    }
+
     LazyColumn {
-        item {
-            BookRowCategoryWise(
-                R.string.psychology_category_title,
-                PsychologyBooks.getBooksList(appContext)
-            )
-            BookRowCategoryWise(
-                R.string.manga_anime_category_title,
-                MangaAnimeBooks.getBooksList(appContext)
-            )
-            BookRowCategoryWise(
-                R.string.business_category_title,
-                BusinessBooks.getBooksList(appContext)
-            )
-            BookRowCategoryWise(
-                R.string.health_safety_category_title,
-                HealthAndSafetyBooks.getBooksList(appContext)
+        items(categories) { category ->
+            // Memoize books per category, keyed by context and category for efficiency
+            val books = remember(context, category) {
+                category.booksProvider(context)
+            }
+            BookCategoryRow(
+                categoryTitleResId = category.titleResId,
+                books = books, // Renamed for clarity
+                onBookClick = { book -> bookViewModel.openDialog(true, book) }
             )
         }
     }
-    if (bookUiState.isDialogOpen == true) {
+
+    if (uiState.isDialogOpen) {
         Dialog(onDismissRequest = { bookViewModel.openDialog(false) }) {
-            BookDetails(bookUiState)
+            BookDetailsDialog( // Renamed for clarity, implies it's content for a Dialog
+                book = uiState.currentBook,
+                onDismiss = { bookViewModel.openDialog(false) }
+            )
         }
     }
 }
 
 @Composable
-fun BookDetails(bookUiState: BookUiState) {
-    Surface(
-        Modifier
-            .background(color = MaterialTheme.colorScheme.background)
-            .clip(
-                RoundedCornerShape(16.dp)
+private fun BookCategoryRow(
+    @StringRes categoryTitleResId: Int,
+    books: List<Book>,
+    onBookClick: (Book) -> Unit, // More specific lambda
+    modifier: Modifier = Modifier // Added modifier parameter
+) {
+    Column(modifier = modifier) { // Added Column to group title and row
+        Text(
+            text = stringResource(categoryTitleResId),
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(
+                start = dimensionResource(R.dimen.padding_large),
+                top = dimensionResource(R.dimen.padding_large),
+                bottom = dimensionResource(R.dimen.padding_extra_small) // Added bottom padding for spacing to LazyRow
             )
-    ) {
-        Column(
-            Modifier.padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = bookUiState.currentBook.imageRes),
-                contentDescription = "Book cover",
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(200.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = dimensionResource(R.dimen.book_image_round_top_start),
-                            topEnd = 0.dp,
-                            bottomEnd = dimensionResource(R.dimen.book_image_round_bottom),
-                            bottomStart = dimensionResource(R.dimen.book_image_round_bottom)
-                        )
-                    )
-            )
-            Spacer(Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = {}) { Text("dud") }
-                Button(onClick = {}) { }
+        )
+        // Removed Spacer, padding on Text is enough
+        LazyRow {
+            items(books) { book ->
+                BookDisplayCard(
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(R.dimen.padding_small)) // Use horizontal for consistency
+                        .height(280.dp), // Consider making this dynamic or passed as a parameter
+                    book = book,
+                    onCardClicked = { onBookClick(book) }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun BookRowCategoryWise(categoryTitleResId: Int, bookList: List<Book>) {
-    val bookViewModel: BookViewModel = viewModel()
-    Text(
-        stringResource(categoryTitleResId),
-        style = MaterialTheme.typography.headlineLarge,
-        modifier = Modifier.padding(
-            start = dimensionResource(R.dimen.padding_large),
-            top = dimensionResource(R.dimen.padding_large)
-        )
-    )
-    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_small)))
-    LazyRow {
-        items(bookList) { book ->
-            BookDisplayCard(
-                Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
-                    .height(280.dp),
-                book,
-                onCardClicked = {
-                    bookViewModel.openDialog(true, book)
-//                    val link = currentBook.link
-//                    val webIntent = Intent(Intent.ACTION_VIEW, link.toUri())
-//                    if (webIntent.resolveActivity(appContext.packageManager) != null) {
-//                        appContext.startActivity(webIntent)
-//                    } else {
-//                        // 🛑 No app found to handle the Intent
-//                        Toast.makeText(appContext, "No Browser App Found!", Toast.LENGTH_SHORT).show()
-//                    }
-                }
+fun BookDetailsDialog( // Renamed from BookDetails
+    book: Book,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val dialogCornerRadius = dimensionResource(R.dimen.padding_small)
+
+    Surface(
+        modifier = modifier
+            .width(300.dp)
+            .clip(RoundedCornerShape(dialogCornerRadius)), // Apply clipping directly to Surface
+        shape = RoundedCornerShape(dialogCornerRadius), // Shape for elevation shadow and content clipping
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        Column(
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = book.imageRes),
+                contentDescription = book.name, // Good practice
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(dimensionResource(R.dimen.padding_small)))
             )
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
+            Text(
+                text = book.name,
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_extra_small)))
+            Text(
+                text = book.author,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_large)))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.padding_small),
+                    Alignment.CenterHorizontally
+                )
+            ) {
+                OutlinedButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.close_button_text)) // Use string resource
+                }
+                Button(
+                    onClick = {
+                        val webIntent = Intent(Intent.ACTION_VIEW, book.link.toUri())
+                        if (webIntent.resolveActivity(context.packageManager) != null) {
+                            context.startActivity(webIntent)
+                        } else {
+                            Toast.makeText(context, R.string.no_browser_app_found, Toast.LENGTH_SHORT).show() // Use string resource
+                        }
+                    }
+                ) {
+                    Icon(
+                        Icons.Filled.Share,
+                        contentDescription = stringResource(R.string.share_button_cd), // Use string resource
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                    )
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(stringResource(R.string.visit_site_button_text)) // Use string resource
+                }
+            }
         }
     }
 }
+
 
 @Composable
 fun BookDisplayCard(
@@ -163,136 +219,127 @@ fun BookDisplayCard(
     book: Book,
     onCardClicked: () -> Unit,
 ) {
-    Box(
-        modifier = modifier.clickable {
-            onCardClicked()
-        }) {
-        // Book Image - positioned first since it affects text placement
-        Image(
-            painter = painterResource(id = book.imageRes),
-            contentDescription = "Book cover",
-            contentScale = ContentScale.FillHeight,
-            modifier = Modifier
-                .width(150.dp)
-                .height(190.dp)
-                .align(Alignment.TopCenter)
-                .offset(y = dimensionResource(R.dimen.book_image_offset))
-                .zIndex(2f)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = dimensionResource(R.dimen.book_image_round_top_start),
-                        topEnd = 0.dp,
-                        bottomEnd = dimensionResource(R.dimen.book_image_round_bottom),
-                        bottomStart = dimensionResource(R.dimen.book_image_round_bottom)
-                    )
-                )
-        )
-
-        // Card - positioned below the image
-        Card(
-            modifier = Modifier
-                .width(180.dp)
-                .height(210.dp)
-                .align(Alignment.BottomCenter)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)),
-                    clip = true
-                ),
-            shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            // Empty card - text will be positioned outside
-        }
-
-        // Text content - positioned at fixed point relative to image
-        Column(
-            modifier = Modifier
-                .width(160.dp)
-                .align(Alignment.BottomCenter)
-                .offset(y = (-dimensionResource(R.dimen.book_image_offset))) // Fixed position below image
-                .padding(start = dimensionResource(id = R.dimen.padding_medium))
-        ) {
-            Text(
-                text = book.name,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-            Text(
-                text = book.author,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-    }
-}
-
-@Composable
-fun BookDetailsForPreview() {
-    Box(
-        Modifier.background(
-            color = MaterialTheme.colorScheme.background,
-            shape = RoundedCornerShape(16.dp)
+    Card(
+        modifier = modifier
+            .width(180.dp) // Consider making this configurable or based on screen size
+            .clickable { onCardClicked() },
+        shape = RoundedCornerShape(dimensionResource(R.dimen.book_image_round_bottom)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Image(painterResource(R.drawable.back), contentDescription = null)
-        Column(
-            Modifier.padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Book Image - positioned first since it affects text placement
-            Image(
-                painter = painterResource(id = R.drawable.psychology_book_one),
-                contentDescription = "Book cover",
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(160.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = dimensionResource(R.dimen.book_image_round_top_start),
-                            topEnd = 0.dp,
-                            bottomEnd = dimensionResource(R.dimen.book_image_round_bottom),
-                            bottomStart = dimensionResource(R.dimen.book_image_round_bottom)
-                        )
-                    )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            BookImage(
+                imageRes = book.imageRes,
+                contentDescription = book.name
             )
-            Spacer(Modifier.height(8.dp))
-            Row {
-                Button(onClick = {}) { Text("dud") }
-                Button(onClick = {}) { }
-            }
+            BookInfo(
+                name = book.name,
+                author = book.author
+            )
         }
     }
 }
 
-@Preview
 @Composable
-private fun PreviewApp() {
-    BookDiscoveryTheme {
-        BookAppNavHost()
+private fun BookImage(
+    @DrawableRes imageRes: Int,
+    contentDescription: String?, // Nullable as before, though book.name is non-null
+    modifier: Modifier = Modifier
+) {
+    Image(
+        painter = painterResource(id = imageRes),
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Fit, // Or FillHeight/FillWidth depending on desired effect
+        modifier = modifier
+            .height(190.dp) // Fixed height for image within card
+            .fillMaxWidth()
+            .padding(top = dimensionResource(R.dimen.padding_small))
+            .clip(
+                RoundedCornerShape( // Ensure this clipping is visually what you want
+                    topStart = dimensionResource(R.dimen.book_image_round_top_start),
+                    topEnd = 0.dp // Sharp top-right corner
+                )
+            )
+    )
+}
+
+@Composable
+private fun BookInfo(
+    name: String,
+    author: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .padding( // Consistent padding
+                horizontal = dimensionResource(R.dimen.padding_medium),
+                vertical = dimensionResource(R.dimen.padding_small)
+            )
+            .fillMaxWidth() // Ensures text ellipsis works if name is long
+    ) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small))) // Consider using a consistent small padding/spacing value
+        Text(
+            text = author,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1, // Added for consistency, in case author names are very long
+            overflow = TextOverflow.Ellipsis // Added for consistency
+        )
     }
 }
 
-@Preview
+// Preview for BookDetailsDialog (previously BookDetailsForPreview)
+@Preview(showBackground = true, backgroundColor = 0xFFF0F0F0) // Added background for better visibility
 @Composable
-private fun BookPreview() {
+private fun BookDetailsDialogPreview() { // Renamed to match the composable it previews
+    BookDiscoveryTheme { // Wrap with theme for consistent preview
+        BookDetailsDialog(
+            book = Book( // Use a sample Book object
+                R.drawable.psychology_book_one, // Replace with actual drawable
+                "Sample Book Title",
+                "Sample Author Name",
+                "http://example.com"
+            ),
+            onDismiss = {}
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun BookHomeScreenPreview() { // Renamed for clarity
+    BookDiscoveryTheme {
+        // BookAppNavHost might be too complex for a unit preview.
+        // Consider previewing BookHomeScreen directly if BookAppNavHost has navigation logic.
+        // If BookHomeScreen needs a ViewModel, provide a fake one for the preview.
+        BookHomeScreen( /* viewModel = provideFakeViewModelForPreview() */ )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BookDisplayCardPreview() { // Renamed for clarity
     BookDiscoveryTheme {
         BookDisplayCard(
-            Modifier
-                .padding(14.dp)
-                .height(300.dp),
-            PsychologyBooks.getBooksList(LocalContext.current)[0],
+            modifier = Modifier.padding(16.dp), // Increased padding for preview visibility
+            // Provide a real Book object for preview
+            book = PsychologyBooks.getBooksList(LocalContext.current).first(),
             onCardClicked = {}
         )
     }
 }
 
-@Preview
-@Composable
-private fun BookDetailsPreview() {
-    BookDetailsForPreview()
-}
+// Assuming R.string values exist for these:
+// R.string.close_button_text = "Close"
+// R.string.no_browser_app_found = "No Browser App Found!"
+// R.string.share_button_cd = "Share book link"
+// R.string.visit_site_button_text = "Visit Site"
+// R.drawable.placeholder_book (a generic placeholder image)
