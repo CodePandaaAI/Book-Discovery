@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -80,7 +81,9 @@ fun BookHomeScreen(bookViewModel: BookViewModel = viewModel()) { // Allow ViewMo
         )
     }
 
-    LazyColumn {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.padding_small))
+    ) {
         items(categories) { category ->
             // Memoize books per category, keyed by context and category for efficiency
             val books = remember(context, category) {
@@ -118,7 +121,7 @@ private fun BookCategoryRow(
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_large),
                 top = dimensionResource(R.dimen.padding_large),
-                bottom = dimensionResource(R.dimen.padding_extra_small) // Added bottom padding for spacing to LazyRow
+                bottom = dimensionResource(R.dimen.padding_medium) // Added bottom padding for spacing to LazyRow
             )
         )
         // Removed Spacer, padding on Text is enough
@@ -336,10 +339,3 @@ private fun BookDisplayCardPreview() { // Renamed for clarity
         )
     }
 }
-
-// Assuming R.string values exist for these:
-// R.string.close_button_text = "Close"
-// R.string.no_browser_app_found = "No Browser App Found!"
-// R.string.share_button_cd = "Share book link"
-// R.string.visit_site_button_text = "Visit Site"
-// R.drawable.placeholder_book (a generic placeholder image)
